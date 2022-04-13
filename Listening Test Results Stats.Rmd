@@ -1,0 +1,1019 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+```
+```{r}
+results <- read.csv("Listening Test FInal_April 6, 2022_01.28.csv")
+```
+
+```{r}
+results_cut_down <- subset(results, select=c(StartDate, EndDate, Progress, Duration..in.seconds.,                                  Finished, RecordedDate, DistributionChannel, Q1, Q2, Q3, 17:99))
+
+results_cut_down <- results_cut_down[results_cut_down$DistributionChannel %in% c("anonymous"), ]
+
+results_cut_down <- results_cut_down %>%
+                        select(-c(Q6_1, Q8_1))
+                      
+
+# cut any rows with $DistributionChannel == Preview
+```
+
+# to do: do a boxplot of the answers to each question, and a big boxplot of the combined numbers for each voice variant
+
+# Sentence 1 (Question 4): just to get started:
+
+```{r}
+results_S1_long <- results_cut_down %>%
+               select(c(Q4_1:Q4_8)) %>%
+               pivot_longer(Q4_1:Q4_8, names_to="version_number", values_to="result")
+results_S1_long$result <- as.numeric(results_S1_long$result)              
+```
+
+
+```{r}
+ggplot(data=results_S1_long, aes(x = version_number, y = result, na.rm = TRUE)) +
+geom_boxplot() +
+ggtitle("Sentence 1") +
+theme(plot.title = element_text(hjust = 0.45))
+```
+TO DO: NOW MARK WHAT VOICE EACH SENTENCE IS FROM ON THE INDIVIDUAL DATAFRAME, THEN STICK ALL OF THE 
+INDIVIDUAL SENTENCE DATAFRAMES TOGETHER AND BOXPLOT THE SCORES FOR EACH 
+
+3, 2, 4, 1, 6, 5, 7, 8
+
+1. Arctic_a_voice_build original 
+2. Arctic _a reduced_mixture models 
+3. Arctic_a reduced training sentences 
+4. SPT_initial_voice_build 
+5. SPT_reduced_mixture_models 
+6. SPT_reduced training sentences 
+7. Hybrid Voice 
+8. reference
+
+```{r}
+sentence_1_order = c(3, 2, 4, 1, 6, 5, 7, 8)
+
+results_S1_long <-
+results_S1_long %>%
+                  mutate(voice_num = 
+                           ifelse(version_number=="Q4_1", 3,
+                           ifelse(version_number=="Q4_2", 2,
+                           ifelse(version_number=="Q4_3", 4,
+                           ifelse(version_number=="Q4_4", 1,
+                           ifelse(version_number=="Q4_5", 6,
+                           ifelse(version_number=="Q4_6", 5,
+                           ifelse(version_number=="Q4_7", 7,
+                                  8))))))))
+
+results_S1_long$voice_num <- as.character(results_S1_long$voice_num)
+```
+
+# new boxplot of S1 data but with voice num:
+
+```{r}
+ggplot(data=results_S1_long, aes(x = voice_num, y = result, na.rm = TRUE)) +
+geom_boxplot() +
+ggtitle("Sentence 1") +
+theme(plot.title = element_text(hjust = 0.45))
+```
+TO DO: NOW DO A 'LONG' DF FOR EACH OF QUESTIONS 3,  LIKE ABOVE FOR S1, AND THEN STICK S1, S3, S4 and S5 DF'S TOGETHER (all for SPT test sentences except question 2 which is for sub-cost test) AND PLOT AGAIN
+
+S3 DONE
+S4 DONE
+S5 DONE
+
+#S3
+```{r}
+results_S3_long <- results_cut_down %>%
+               select(c(Q6_2:Q6_8)) %>%
+               pivot_longer(Q6_2:Q6_8, names_to="version_number", values_to="result")
+results_S3_long$result <- as.numeric(results_S3_long$result) 
+
+sentence_3_order = c(4, 8, 7, 3, 2, 5, 1, 6)
+
+results_S3_long <-
+results_S3_long %>%
+                  mutate(voice_num = 
+                           ifelse(version_number=="Q6_1", 4,
+                           ifelse(version_number=="Q6_2", 8,
+                           ifelse(version_number=="Q6_3", 7,
+                           ifelse(version_number=="Q6_4", 3,
+                           ifelse(version_number=="Q6_5", 2,
+                           ifelse(version_number=="Q6_6", 5,
+                           ifelse(version_number=="Q6_7", 1,
+                                  6))))))))
+
+results_S3_long$voice_num <- as.character(results_S3_long$voice_num)
+```
+
+```{r}
+ggplot(data=results_S3_long, aes(x = voice_num, y = result, na.rm = TRUE)) +
+geom_boxplot() +
+ggtitle("Sentence 3") +
+theme(plot.title = element_text(hjust = 0.45))
+```
+#S4
+```{r}
+results_S4_long <- results_cut_down %>%
+               select(c(Q7_1:Q7_8)) %>%
+               pivot_longer(Q7_1:Q7_8, names_to="version_number", values_to="result")
+results_S4_long$result <- as.numeric(results_S4_long$result) 
+
+sentence_4_order = c(3, 7, 4, 2, 1, 6, 8, 5)
+
+results_S4_long <-
+results_S4_long %>%
+                  mutate(voice_num = 
+                           ifelse(version_number=="Q7_1", 3,
+                           ifelse(version_number=="Q7_2", 7,
+                           ifelse(version_number=="Q7_3", 4,
+                           ifelse(version_number=="Q7_4", 2,
+                           ifelse(version_number=="Q7_5", 1,
+                           ifelse(version_number=="Q7_6", 6,
+                           ifelse(version_number=="Q7_7", 8,
+                                  5))))))))
+
+results_S4_long$voice_num <- as.character(results_S4_long$voice_num)
+```
+
+```{r}
+ggplot(data=results_S4_long, aes(x = voice_num, y = result, na.rm = TRUE)) +
+geom_boxplot() +
+ggtitle("Sentence 4") +
+theme(plot.title = element_text(hjust = 0.45))
+```
+#S5
+```{r}
+results_S5_long <- results_cut_down %>%
+               select(c(Q8_2:Q8_8)) %>%
+               pivot_longer(Q8_2:Q8_8, names_to="version_number", values_to="result")
+results_S5_long$result <- as.numeric(results_S5_long$result) 
+
+sentence_5_order = c(4, 3, 2, 6, 8, 7, 5, 1)
+
+results_S5_long <-
+results_S5_long %>%
+                  mutate(voice_num = 
+                           ifelse(version_number=="Q8_1", 4,
+                           ifelse(version_number=="Q8_2", 3,
+                           ifelse(version_number=="Q8_3", 2,
+                           ifelse(version_number=="Q8_4", 6,
+                           ifelse(version_number=="Q8_5", 8,
+                           ifelse(version_number=="Q8_6", 7,
+                           ifelse(version_number=="Q8_7", 5,
+                                  1))))))))
+
+results_S5_long$voice_num <- as.character(results_S5_long$voice_num)
+```
+
+```{r}
+ggplot(data=results_S5_long, aes(x = voice_num, y = result, na.rm = TRUE)) +
+geom_boxplot() +
+ggtitle("Sentence 5") +
+theme(plot.title = element_text(hjust = 0.45))
+```
+```{r}
+results_spt_sentences_long <- rbind(results_S1_long, results_S3_long, results_S4_long, results_S5_long)
+```
+
+```{r}
+# do a version_name column, which will be universal based on ifelse of the voice_num column (i.e. this
+# shouldn't need to be changed for each question)
+results_spt_sentences_long <-
+results_spt_sentences_long %>%
+                  mutate(voice_name= 
+                           ifelse(voice_num=="1", "Arctic A Original",
+                           ifelse(voice_num=="2", "Arctic A Reduced Mixture Models",
+                           ifelse(voice_num=="3", "Arctic A Reduced Training Sentences",
+                           ifelse(voice_num=="4", "SPT Original",
+                           ifelse(voice_num=="5", "SPT Reduced Mixture Models",
+                           ifelse(voice_num=="6", "SPT Reduced Training Sentences",
+                           ifelse(voice_num=="7", "Hybrid Voice",
+                                  "Reference"))))))))
+
+
+```
+
+```{r}
+spt_plot <- ggplot(data=results_spt_sentences_long, aes(x = voice_num, y = result, na.rm = TRUE)) +
+geom_boxplot() +
+ggtitle("SPT Sentences Results") +
+theme(plot.title = element_text(hjust = 0.45))
+spt_plot
+```
+# TO DO: CREATE LONG DF'S AND STICK TOGETHER FOR 
+
+S6 DONE
+S7 DONE
+S8 DONE
+S9 DONE
+S10 DONE
+
+#S6
+```{r}
+results_S6_long <- results_cut_down %>%
+               select(c(Q9_1:Q9_8)) %>%
+               pivot_longer(Q9_1:Q9_8, names_to="version_number", values_to="result")
+results_S6_long$result <- as.numeric(results_S6_long$result) 
+
+sentence_6_order = c(5, 2, 8, 4, 6, 3, 1, 7)
+
+results_S6_long <-
+results_S6_long %>%
+                  mutate(voice_num = 
+                           ifelse(version_number=="Q9_1", 5,
+                           ifelse(version_number=="Q9_2", 2,
+                           ifelse(version_number=="Q9_3", 8,
+                           ifelse(version_number=="Q9_4", 4,
+                           ifelse(version_number=="Q9_5", 6,
+                           ifelse(version_number=="Q9_6", 3,
+                           ifelse(version_number=="Q9_7", 1,
+                                  7))))))))
+
+results_S6_long$voice_num <- as.character(results_S6_long$voice_num)
+```
+
+```{r}
+ggplot(data=results_S6_long, aes(x = voice_num, y = result, na.rm = TRUE)) +
+geom_boxplot() +
+ggtitle("Sentence 6") +
+theme(plot.title = element_text(hjust = 0.45))
+```
+#S7
+```{r}
+results_S7_long <- results_cut_down %>%
+               select(c(Q10_1:Q10_8)) %>%
+               pivot_longer(Q10_1:Q10_8, names_to="version_number", values_to="result")
+results_S7_long$result <- as.numeric(results_S7_long$result) 
+
+sentence_7_order = c(4, 7, 1, 8, 6, 3, 2, 5)
+
+results_S7_long <-
+results_S7_long %>%
+                  mutate(voice_num = 
+                           ifelse(version_number=="Q10_1", 4,
+                           ifelse(version_number=="Q10_2", 7,
+                           ifelse(version_number=="Q10_3", 1,
+                           ifelse(version_number=="Q10_4", 8,
+                           ifelse(version_number=="Q10_5", 6,
+                           ifelse(version_number=="Q10_6", 3,
+                           ifelse(version_number=="Q10_7", 2,
+                                  5))))))))
+
+results_S7_long$voice_num <- as.character(results_S7_long$voice_num)
+```
+
+```{r}
+ggplot(data=results_S7_long, aes(x = voice_num, y = result, na.rm = TRUE)) +
+geom_boxplot() +
+ggtitle("Sentence 7") +
+theme(plot.title = element_text(hjust = 0.45))
+```
+
+#S8
+```{r}
+results_S8_long <- results_cut_down %>%
+               select(c(Q11_1:Q11_8)) %>%
+               pivot_longer(Q11_1:Q11_8, names_to="version_number", values_to="result")
+results_S8_long$result <- as.numeric(results_S8_long$result) 
+
+sentence_8_order = c(2, 3, 8, 5, 1, 7, 6, 4)
+
+results_S8_long <-
+results_S8_long %>%
+                  mutate(voice_num = 
+                           ifelse(version_number=="Q11_1", 2,
+                           ifelse(version_number=="Q11_2", 3,
+                           ifelse(version_number=="Q11_3", 8,
+                           ifelse(version_number=="Q11_4", 5,
+                           ifelse(version_number=="Q11_5", 1,
+                           ifelse(version_number=="Q11_6", 7,
+                           ifelse(version_number=="Q11_7", 6,
+                                  4))))))))
+
+results_S8_long$voice_num <- as.character(results_S8_long$voice_num)
+```
+
+```{r}
+ggplot(data=results_S8_long, aes(x = voice_num, y = result, na.rm = TRUE)) +
+geom_boxplot() +
+ggtitle("Sentence 8") +
+theme(plot.title = element_text(hjust = 0.45))
+```
+
+#S9
+```{r}
+results_S9_long <- results_cut_down %>%
+               select(c(Q12_1:Q12_8)) %>%
+               pivot_longer(Q12_1:Q12_8, names_to="version_number", values_to="result")
+results_S9_long$result <- as.numeric(results_S9_long$result) 
+
+sentence_9_order = c(1, 5, 6, 2, 3, 7, 4, 8)
+
+results_S9_long <-
+results_S9_long %>%
+                  mutate(voice_num = 
+                           ifelse(version_number=="Q12_1", 1,
+                           ifelse(version_number=="Q12_2", 5,
+                           ifelse(version_number=="Q12_3", 6,
+                           ifelse(version_number=="Q12_4", 2,
+                           ifelse(version_number=="Q12_5", 3,
+                           ifelse(version_number=="Q12_6", 7,
+                           ifelse(version_number=="Q12_7", 4,
+                                  8))))))))
+
+results_S9_long$voice_num <- as.character(results_S9_long$voice_num)
+```
+
+```{r}
+ggplot(data=results_S9_long, aes(x = voice_num, y = result, na.rm = TRUE)) +
+geom_boxplot() +
+ggtitle("Sentence 9") +
+theme(plot.title = element_text(hjust = 0.45))
+```
+
+#S10
+
+```{r}
+results_S10_long <- results_cut_down %>%
+               select(c(Q13_1:Q13_8)) %>%
+               pivot_longer(Q13_1:Q13_8, names_to="version_number", values_to="result")
+results_S10_long$result <- as.numeric(results_S10_long$result) 
+
+sentence_10_order = c(8, 5, 3, 1, 7, 2, 4, 6)
+
+results_S10_long <-
+results_S10_long %>%
+                  mutate(voice_num = 
+                           ifelse(version_number=="Q13_1", 8,
+                           ifelse(version_number=="Q13_2", 5,
+                           ifelse(version_number=="Q13_3", 3,
+                           ifelse(version_number=="Q13_4", 1,
+                           ifelse(version_number=="Q13_5", 7,
+                           ifelse(version_number=="Q13_6", 2,
+                           ifelse(version_number=="Q13_7", 4,
+                                  6))))))))
+
+results_S10_long$voice_num <- as.character(results_S10_long$voice_num)
+```
+
+```{r}
+ggplot(data=results_S10_long, aes(x = voice_num, y = result, na.rm = TRUE)) +
+geom_boxplot() +
+ggtitle("Sentence 10") +
+theme(plot.title = element_text(hjust = 0.45))
+```
+```{r}
+results_arctic_b_sentences_long <- rbind(results_S6_long, results_S7_long, results_S8_long, results_S9_long, results_S10_long)
+```
+
+```{r}
+results_arctic_b_sentences_long <-
+results_arctic_b_sentences_long %>%
+                  mutate(voice_name= 
+                           ifelse(voice_num=="1", "Arctic A Original",
+                           ifelse(voice_num=="2", "Arctic A Reduced Mixture Models",
+                           ifelse(voice_num=="3", "Arctic A Reduced Training Sentences",
+                           ifelse(voice_num=="4", "SPT Original",
+                           ifelse(voice_num=="5", "SPT Reduced Mixture Models",
+                           ifelse(voice_num=="6", "SPT Reduced Training Sentences",
+                           ifelse(voice_num=="7", "Hybrid Voice",
+                                  "Reference"))))))))
+```
+
+```{r}
+ARCTIC_B_PLOT <- ggplot(data=results_arctic_b_sentences_long, aes(x = voice_num, y = result, na.rm = TRUE)) +
+geom_boxplot() +
+ggtitle("ARCTIC B Sentences Results") +
+theme(plot.title = element_text(hjust = 0.45))
+```
+
+```{r}
+spt_plot
+
+ARCTIC_B_PLOT
+```
+
+TO DO: THEN RUN T-TESTS FOR THE HYPOTHESES BASED ON THE BIG DF's for each test sentence group
+
+
+HYPOTHESIS 1:
+
+# SPT test sentence t-test
+
+```{r}
+results_spt_sentences_long_just_sentence_1_and_4 <- results_spt_sentences_long %>%
+                                                   filter(voice_num == "1" | voice_num == "4")
+
+```
+
+```{r}
+SPT_sentence_t_test <- with(results_spt_sentences_long_just_sentence_1_and_4, t.test(result ~ voice_num, alternative = "less"))
+SPT_sentence_t_test
+```
+Boxplot to go with SPT test sentence t-test:
+
+
+```{r}
+SPT_1_AND_4_PLOT <- ggplot(data=results_spt_sentences_long_just_sentence_1_and_4, aes(x = voice_name, y = result, na.rm = TRUE)) +
+geom_boxplot() +
+ggtitle("SPT test sentence original builds: ARCTIC A vs SPT Database Results") +
+theme(plot.title = element_text(hjust = 0.45)) +
+ylab("Score") +
+xlab("Voice Name")
+ggsave("SPT_1_AND_4_PLOT.png")
+
+SPT_1_AND_4_PLOT 
+```
+```{r}
+results_spt_sentences_long_just_voice_1 <- results_spt_sentences_long %>%
+                                                   filter(voice_num == "1") %>%
+                                                   filter(result != "NA") %>%
+                                                   mutate("result 1-5" = result/20)
+mean(results_spt_sentences_long_just_voice_1$result)         
+mean(results_spt_sentences_long_just_voice_1$`result 1-5`)
+sd(results_spt_sentences_long_just_voice_1$`result 1-5`)
+```
+```{r}
+N = nrow(results_spt_sentences_long_just_voice_1)
+C_I_95 = (1.96 * sd(results_spt_sentences_long_just_voice_1$`result 1-5`)) / sqrt(N)
+C_I_95
+```
+
+
+
+
+```{r}
+results_spt_sentences_long_just_voice_7 <- results_spt_sentences_long %>%
+                                                   filter(voice_num == "7") %>%
+                                                   filter(result != "NA") %>%
+                                                   mutate("result 1-5" = result/20)
+mean(results_spt_sentences_long_just_voice_7$result)         
+mean(results_spt_sentences_long_just_voice_7$`result 1-5`)
+sd(results_spt_sentences_long_just_voice_7$`result 1-5`)
+```
+```{r}
+N = nrow(results_spt_sentences_long_just_voice_7)
+C_I_95 = (1.96 * sd(results_spt_sentences_long_just_voice_7$`result 1-5`)) / sqrt(N)
+C_I_95
+```
+
+
+
+
+
+
+
+
+
+
+
+```{r}
+results_spt_sentences_long_just_voice_4 <- results_spt_sentences_long %>%
+                                                   filter(voice_num == "4") %>%
+                                                   filter(result != "NA") %>%
+                                                   mutate("result 1-5" = result/20)
+mean(results_spt_sentences_long_just_voice_4$result)         
+mean(results_spt_sentences_long_just_voice_4$`result 1-5`)
+sd(results_spt_sentences_long_just_voice_4$`result 1-5`)
+```
+```{r}
+N = nrow(results_spt_sentences_long_just_voice_4)
+C_I_95 = (1.96 * sd(results_spt_sentences_long_just_voice_4$`result 1-5`)) / sqrt(N)
+C_I_95
+```
+
+
+
+
+# Arctic B test sentence t-test
+
+```{r}
+results_ARCTIC_B_sentences_long_just_sentence_1_and_4 <- results_arctic_b_sentences_long %>%
+                                                   filter(voice_num == "1" | voice_num == "4")
+```
+
+```{r}
+ARCTIC_B_sentence_t_test <- with(results_ARCTIC_B_sentences_long_just_sentence_1_and_4, t.test(result ~ voice_num, alternative = "greater"))
+ARCTIC_B_sentence_t_test
+```
+Boxplot to go with SPT test sentence t-test:
+
+
+```{r}
+ARCTIC_1_AND_4_PLOT <- ggplot(data=results_ARCTIC_B_sentences_long_just_sentence_1_and_4, aes(x = voice_name, y = result, na.rm = TRUE)) +
+geom_boxplot() +
+ggtitle("ARCTIC B test sentence original builds: ARCTIC A vs SPT Database Results") +
+theme(plot.title = element_text(hjust = 0.45)) +
+ylab("Score") +
+xlab("Voice Name")
+ggsave("ARCTIC_1_AND_4_PLOT.png")
+
+ARCTIC_1_AND_4_PLOT 
+```
+```{r}
+results_arctic_sentences_long_just_voice_4 <-  results_arctic_b_sentences_long %>%
+                                                   filter(voice_num == "4") %>%
+                                                   filter(result != "NA") %>%
+                                                   mutate("result 1-5" = result/20)
+mean(results_arctic_sentences_long_just_voice_4$result)         
+mean(results_arctic_sentences_long_just_voice_4$`result 1-5`)
+sd(results_arctic_sentences_long_just_voice_4$`result 1-5`)
+```
+```{r}
+N = nrow(results_arctic_sentences_long_just_voice_4)
+C_I_95 = (1.96 * sd(results_arctic_sentences_long_just_voice_4$`result 1-5`)) / sqrt(N)
+C_I_95
+```
+```{r}
+results_arctic_sentences_long_just_voice_7 <- results_arctic_b_sentences_long %>%
+                                                   filter(voice_num == "7") %>%
+                                                   filter(result != "NA") %>%
+                                                   mutate("result 1-5" = result/20)
+mean(results_arctic_sentences_long_just_voice_7$result)         
+mean(results_arctic_sentences_long_just_voice_7$`result 1-5`)
+sd(results_arctic_sentences_long_just_voice_7$`result 1-5`)
+N = nrow(results_arctic_sentences_long_just_voice_7)
+C_I_95 = (1.96 * sd(results_arctic_sentences_long_just_voice_7$`result 1-5`)) / sqrt(N)
+C_I_95
+```
+```{r}
+results_arctic_sentences_long_just_voice_1 <-  results_arctic_b_sentences_long %>%
+                                                   filter(voice_num == "1") %>%
+                                                   filter(result != "NA") %>%
+                                                   mutate("result 1-5" = result/20)
+mean(results_arctic_sentences_long_just_voice_1$result)         
+mean(results_arctic_sentences_long_just_voice_1$`result 1-5`)
+sd(results_arctic_sentences_long_just_voice_1$`result 1-5`)
+```
+```{r}
+N = nrow(results_arctic_sentences_long_just_voice_1)
+C_I_95 = (1.96 * sd(results_arctic_sentences_long_just_voice_1$`result 1-5`)) / sqrt(N)
+C_I_95
+```
+
+
+
+
+
+
+
+# FOR REPORT: the difference in means in pretty consistent in both directions: i.e. when tested on SPT sentences, the SPT trained voice has a mean of about 50, whilst the ARCTIC voice has a mean of about 39, a statisically significant difference (p ~ 0.008). When tested on ARCTIC sentences, the ARCTIC trained voice has a mean of about 50, and the SPT voice has a mean of about 36, a statistically significant difference (p ~ 0.001)  
+
+
+# Add a 'same_domain' boolean column to each of the longdf's
+
+# SPT
+```{r}
+results_spt_sentences_long <- results_spt_sentences_long %>%
+                                            filter(voice_num!= "7" & voice_num != "8")
+                                    
+results_spt_sentences_long <- results_spt_sentences_long %>%
+                                       mutate(same_domain = 
+                                                ifelse(voice_num %in% c(4, 5, 6), TRUE, FALSE))
+```
+
+# ARCTIC_B
+```{r}
+results_arctic_b_sentences_long <- results_arctic_b_sentences_long %>%
+                                            filter(voice_num!= "7" & voice_num != "8")
+                                    
+results_arctic_b_sentences_long <- results_arctic_b_sentences_long %>%
+                                       mutate(same_domain = 
+                                                ifelse(voice_num %in% c(1, 2, 3), TRUE, FALSE))
+```
+
+# combine the two test_sentence longdf's into one df: DONE
+
+```{r}
+combined_long_df_arctic_b_and_spt <- rbind(results_spt_sentences_long, results_arctic_b_sentences_long)
+```
+
+TO DO: do a linear model
+
+```{r}
+same_domain_lm <- lm(result ~ same_domain, data = combined_long_df_arctic_b_and_spt)
+summary(same_domain_lm)
+```
+```{r}
+results_spt_sentences_long <- results_spt_sentences_long %>%
+                                            filter(voice_num != "8")
+                                    
+results_spt_sentences_long <- results_spt_sentences_long %>%
+                                       mutate(domain_1_2_3 = 
+                                                ifelse(voice_num %in% c(4, 5, 6), "1", 
+                                                ifelse(voice_num == 7, "2",
+                                                       "3")))
+
+
+results_arctic_b_sentences_long <- results_arctic_b_sentences_long %>%
+                                          filter(voice_num != "8")
+                                    
+results_arctic_b_sentences_long <- results_arctic_b_sentences_long %>%
+                                      mutate(domain_1_2_3 = 
+                                               ifelse(voice_num %in% c(1, 2, 3), "1", 
+                                                      ifelse(voice_num == 7, "2",
+                                                      "3")))
+
+combined_long_df_arctic_b_and_spt <- rbind(results_spt_sentences_long, results_arctic_b_sentences_long)
+
+```
+
+```{r}
+domain_1_2_3_lm <- lm(result ~ domain_1_2_3, data = combined_long_df_arctic_b_and_spt)
+summary(domain_1_2_3_lm)
+```
+
+
+
+
+
+
+
+
+```{r}
+
+combined_long_df_arctic_b_and_spt <-  combined_long_df_arctic_b_and_spt %>%
+                                                   mutate(result_1_5 = result/20)
+
+same_domain_lm <- lm(result_1_5 ~ same_domain, data = combined_long_df_arctic_b_and_spt )
+summary(same_domain_lm)
+```
+
+
+
+
+
+
+# HYPOTHESIS 2 TESTING
+
+so test each test sentence set:
+
+
+ARCTIC A > ARCTIC B: 
+
+Voice 1 (Full) vs Voice 2 (reduced mixture models) 
+
+On ARCTIC B sentences: 6, 7, 8, 9, 10
+
+
+```{r}
+hyp_2_arctic_results <- results_arctic_b_sentences_long %>%
+                                     filter(voice_num == "1" | voice_num == "2")
+```
+
+
+```{r}
+hyp_2_arctic_t_test <- with(hyp_2_arctic_results, t.test(result ~ voice_num, alternative = "greater"))
+hyp_2_arctic_t_test
+```
+```{r}
+results_arctic_sentences_long_just_voice_2 <-  results_arctic_b_sentences_long %>%
+                                                   filter(voice_num == "2") %>%
+                                                   filter(result != "NA") %>%
+                                                   mutate("result 1-5" = result/20)
+mean(results_arctic_sentences_long_just_voice_2$result)         
+mean(results_arctic_sentences_long_just_voice_2$`result 1-5`)
+sd(results_arctic_sentences_long_just_voice_2$`result 1-5`)
+```
+```{r}
+N = nrow(results_arctic_sentences_long_just_voice_2)
+C_I_95 = (1.96 * sd(results_arctic_sentences_long_just_voice_2$`result 1-5`)) / sqrt(N)
+C_I_95
+```
+
+
+
+
+
+```{r}
+hyp_2_spt_results <- results_spt_sentences_long %>%
+                                     filter(voice_num == "4" | voice_num == "5")
+```
+
+
+```{r}
+hyp_2_spt_t_test <- with(hyp_2_spt_results, t.test(result ~ voice_num, alternative = "greater"))
+hyp_2_spt_t_test
+```
+```{r}
+results_spt_sentences_long_just_voice_5 <-  hyp_2_spt_results %>%
+                                                   filter(voice_num == "5") %>%
+                                                   filter(result != "NA") %>%
+                                                   mutate("result 1-5" = result/20)
+mean(results_spt_sentences_long_just_voice_5$result)         
+mean(results_spt_sentences_long_just_voice_5$`result 1-5`)
+sd(results_spt_sentences_long_just_voice_5$`result 1-5`)
+```
+
+
+```{r}
+N = nrow(results_spt_sentences_long_just_voice_5)
+C_I_95 = (1.96 * sd(results_spt_sentences_long_just_voice_5$`result 1-5`)) / sqrt(N)
+C_I_95
+```
+
+
+
+
+
+
+
+
+
+RESULTS: so a small, but not statistically significant, difference in means (more mixture components = higher score) of 6.93 for the arctic voices, but actually a small, but not statistically significant, increase in score of 0.77 for the spt voices.
+
+linear model: 
+
+```{r}
+combined_hyp_2_results <- rbind(hyp_2_arctic_results, hyp_2_spt_results)
+
+combined_hyp_2_results <- combined_hyp_2_results %>%
+                                       mutate(more_mixture = 
+                                                ifelse(voice_num %in% c(1, 4), TRUE, FALSE))
+
+mixture_comp_lm <- lm(result ~ more_mixture, data = combined_hyp_2_results)
+summary(mixture_comp_lm)
+```
+So confirmed by the linear model: a slight reduction in performance (-.077) but not statistically significant. 
+
+```{r}
+
+combined_hyp_2_results <-  combined_hyp_2_results %>%
+                                                   mutate(result_1_5 = result/20)
+
+same_domain_lm <- lm(result_1_5 ~ more_mixture, data = combined_hyp_2_results)
+summary(same_domain_lm)
+
+```
+
+
+
+
+HYPOTHESIS 3:
+
+SO REDUCED TRAINING SENTENCE EFFECT:
+
+SO:
+
+VOICE 4 VS VOICE 6 ON TEST SENTENCES 1, 3, 4, 5
+
+AND
+
+VOICE 1 VS VOICE 3 ON TEST SENTENCES 6, 7, 8, 9, 10
+
+
+
+
+```{r}
+
+hyp_3_spt_results <- results_spt_sentences_long %>%
+                                     filter(voice_num == "4" | voice_num == "6")
+
+hyp_3_spt_t_test <- with(hyp_3_spt_results, t.test(result ~ voice_num, alternative = "greater"))
+hyp_3_spt_t_test
+
+```
+```{r}
+hyp_3_spt_results_6 <-  hyp_3_spt_results %>%
+                                                   filter(voice_num == "6") %>%
+                                                   filter(result != "NA") %>%
+                                                   mutate("result 1-5" = result/20)
+mean(hyp_3_spt_results_6$result)         
+mean(hyp_3_spt_results_6$`result 1-5`)
+sd(hyp_3_spt_results_6$`result 1-5`)
+```
+```{r}
+N = nrow(hyp_3_spt_results_6)
+C_I_95 = (1.96 * sd(hyp_3_spt_results_6$`result 1-5`)) / sqrt(N)
+C_I_95
+```
+
+
+
+
+
+```{r}
+
+hyp_3_arctic_results <- results_arctic_b_sentences_long %>%
+                                     filter(voice_num == "1" | voice_num == "3")
+
+hyp_3_arctic_t_test <- with(hyp_3_arctic_results, t.test(result ~ voice_num, alternative = "greater"))
+hyp_3_arctic_t_test
+
+```
+```{r}
+hyp_3_arctic_results_3 <-  hyp_3_arctic_results %>%
+                                                   filter(voice_num == "3") %>%
+                                                   filter(result != "NA") %>%
+                                                   mutate("result 1-5" = result/20)
+mean(hyp_3_arctic_results_3$result)         
+mean(hyp_3_arctic_results_3$`result 1-5`)
+sd(hyp_3_arctic_results_3$`result 1-5`)
+```
+```{r}
+N = nrow(hyp_3_arctic_results_3)
+C_I_95 = (1.96 * sd(hyp_3_arctic_results_3$`result 1-5`)) / sqrt(N)
+C_I_95
+```
+
+
+
+
+```{r}
+combined_hyp_3_results <- rbind(hyp_3_arctic_results, hyp_3_spt_results)
+
+combined_hyp_3_results <- combined_hyp_3_results %>%
+                                       mutate(more_training = 
+                                                ifelse(voice_num %in% c(1, 4), TRUE, FALSE))
+
+reduced_training_comp_lm <- lm(result ~ more_training, data = combined_hyp_3_results)
+summary(reduced_training_comp_lm)
+```
+
+so i get a (borderline) significant t-test result for hyp 3 arctic result, but not for the hyp 3 spt result, and no significant effect of more training from the
+linear model.
+
+what's going on here?
+
+to do: check that the versions are right for each of the spt sentences (are 4 and 6 where you think they are?):
+
+1 (should be: 4 in position 3 YES, and 6 in position 5 YES) GOOD
+3 (should be : 4 in position 1 NO, and 6 in position 8 YES) SO NO GOOD, DISCOUNT VOICE 4 DATA
+4 (should be: 4 in position 3 YES, and 6 in position 6 YES) GOOD
+5 (should be: 4 in position 1 NO, 6 in position 4 YES) SO NO GOOD, DISCOUNT VOICE 4 DATA
+
+
+# TO DO: DO THE DF, PLOT AND STATS FOR HYPOTHESIS 4
+
+#S2
+```{r}
+results_S2_long <- results_cut_down %>%
+               select(c(Q5_1:Q5_7)) %>%
+               pivot_longer(Q5_1:Q5_7, names_to="version_number", values_to="result")
+results_S2_long$result <- as.numeric(results_S2_long$result) 
+
+results_S2_long <-
+results_S2_long %>%
+                  mutate(voice_num = 
+                           ifelse(version_number=="Q5_1", 1,
+                           ifelse(version_number=="Q5_2", 2,
+                           ifelse(version_number=="Q5_3", 3,
+                           ifelse(version_number=="Q5_4", 4,
+                           ifelse(version_number=="Q5_5", 5,
+                           ifelse(version_number=="Q5_6", 6,
+                                  7)))))))
+
+results_S2_long$voice_num <- as.character(results_S2_long$voice_num)
+```
+
+```{r}
+ggplot(data=results_S2_long, aes(x = voice_num, y = result, na.rm = TRUE)) +
+geom_boxplot() +
+ggtitle("Sentence 2") +
+theme(plot.title = element_text(hjust = 0.45))
+```
+
+# TO DO: adapt this
+```{r}
+results_S2_long <-
+results_S2_long %>%
+                  mutate(voice_name= 
+                           ifelse(voice_num=="1", "Hybrid Voice",
+                           ifelse(voice_num=="2", "F0 Voice",
+                           ifelse(voice_num=="3", "SPT Original",
+                           ifelse(voice_num=="4", "Reference",
+                           ifelse(voice_num=="5", "SW Voice",
+                           ifelse(voice_num=="6", "ARCTIC A Original",
+                           ifelse(voice_num=="7", "PW Voice",
+                                  "Reference"))))))))
+```
+
+
+to do: check the sentence order in the survey for sentence 2:
+
+questions for hyp2:
+
+is voice 1 better than voice 2?
+
+```{r}
+hyp_4_f0_comparison_results <- results_S2_long %>%
+                                     filter(voice_num == "1" | voice_num == "2")
+
+hyp_4_f0_t_test <- with(hyp_4_f0_comparison_results, t.test(result ~ voice_num, alternative = "greater"))
+hyp_4_f0_t_test 
+```
+is voice 1 better than voice 5?
+
+```{r}
+hyp_4_sw_comparison_results <- results_S2_long %>%
+                                     filter(voice_num == "1" | voice_num == "5")
+
+hyp_4_sw_t_test <- with(hyp_4_sw_comparison_results, t.test(result ~ voice_num, alternative = "greater"))
+hyp_4_sw_t_test 
+```
+is voice 1 better than voice 6?
+
+```{r}
+hyp_4_pw_comparison_results <- results_S2_long %>%
+                                     filter(voice_num == "1" | voice_num == "7")
+
+hyp_4_pw_t_test <- with(hyp_4_pw_comparison_results, t.test(result ~ voice_num, alternative = "greater"))
+hyp_4_pw_t_test 
+```
+# so no statistically significant results for any of the three: the hypothesis is not supported.
+
+# note that there are clear differences between the three (i.e. 1 is clearly better than the others) but this has not come out in the results. why?
+
+
+```{r}
+hyp_4_results_1 <-  results_S2_long %>%
+                                                   filter(voice_num == "1") %>%
+                                                   filter(result != "NA") %>%
+                                                   mutate("result 1-5" = result/20)
+mean(hyp_4_results_1$result)         
+mean(hyp_4_results_1$`result 1-5`)
+sd(hyp_4_results_1$`result 1-5`)
+N = nrow(hyp_4_results_1)
+C_I_95 = (1.96 * sd(hyp_4_results_1$`result 1-5`)) / sqrt(N)
+C_I_95
+```
+```{r}
+hyp_4_results_2 <-  results_S2_long %>%
+                                                   filter(voice_num == "2") %>%
+                                                   filter(result != "NA") %>%
+                                                   mutate("result 1-5" = result/20)
+mean(hyp_4_results_2$result)         
+mean(hyp_4_results_2$`result 1-5`)
+sd(hyp_4_results_2$`result 1-5`)
+N = nrow(hyp_4_results_2)
+C_I_95 = (1.96 * sd(hyp_4_results_2$`result 1-5`)) / sqrt(N)
+C_I_95
+```
+
+
+```{r}
+hyp_4_results_5 <-  results_S2_long %>%
+                                                   filter(voice_num == "5") %>%
+                                                   filter(result != "NA") %>%
+                                                   mutate("result 1-5" = result/20)
+mean(hyp_4_results_5$result)         
+mean(hyp_4_results_5$`result 1-5`)
+sd(hyp_4_results_5$`result 1-5`)
+N = nrow(hyp_4_results_5)
+C_I_95 = (1.96 * sd(hyp_4_results_5$`result 1-5`)) / sqrt(N)
+C_I_95
+```
+
+
+
+```{r}
+hyp_4_results_7 <-  results_S2_long %>%
+                                                   filter(voice_num == "7") %>%
+                                                   filter(result != "NA") %>%
+                                                   mutate("result 1-5" = result/20)
+mean(hyp_4_results_7$result)         
+mean(hyp_4_results_7$`result 1-5`)
+sd(hyp_4_results_7$`result 1-5`)
+N = nrow(hyp_4_results_7)
+C_I_95 = (1.96 * sd(hyp_4_results_7$`result 1-5`)) / sqrt(N)
+C_I_95
+```
+
+
+
+
+
+
+
+
+
+
+
+
+```{r}
+results_real <- results %>%
+                 filter(Q4_1 != "")
+```
+
+```{r}
+age_counts <- table(results_real$Q1)
+age_counts
+```
+```{r}
+native_counts <- table(results_real$Q2)
+native_counts
+```
+
+```{r}
+gender_counts <- table(results_real$Q3)
+gender_counts
+```
+
+
+
+
